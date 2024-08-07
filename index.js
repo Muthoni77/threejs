@@ -3,7 +3,10 @@ import { OrbitControls } from "jsm/controls/OrbitControls.js";
 
 const w = window.innerWidth;
 const h = window.innerHeight;
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+// renderer.setAnimationLoop(animate);
+// const renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer = new THREE.WebGLRenderer();
+renderer.setAnimationLoop(animate);
 renderer.setSize(w, h);
 document.body.appendChild(renderer.domElement);
 const fov = 75;
@@ -20,13 +23,13 @@ controls.dampingFactor = 0.03;
 
 const geo = new THREE.IcosahedronGeometry(1.0, 1.0);
 const mat = new THREE.MeshStandardMaterial({
-  color: 0xffa500,
+  color: 0x000035,
   flatShading: true,
   transparent: true,
   opacity: 1.0,
 });
 const wireMat = new THREE.MeshBasicMaterial({
-  color: 0xffffff,
+  color: 0x00000,
   wireframe: true,
 });
 const wireMesh = new THREE.Mesh(geo, wireMat);
@@ -35,11 +38,14 @@ const mesh = new THREE.Mesh(geo, mat);
 mesh.add(wireMesh);
 scene.add(mesh);
 
-const hemiLight = new THREE.HemisphereLight(0xffa500, 0xff0000);
+const hemiLight = new THREE.HemisphereLight(0x000080, 0x000035, 0x000053);
 scene.add(hemiLight);
 
 function animate() {
-  requestAnimationFrame(animate);
+  wireMesh.rotation.x += 0.01;
+  wireMesh.rotation.y += 0.01;
+
+  // requestAnimationFrame(animate);
   renderer.render(scene, camera);
   controls.update();
 }
