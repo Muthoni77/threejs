@@ -1,52 +1,76 @@
+import "./style.css";
 import * as THREE from "three";
-import { OrbitControls } from "jsm/controls/OrbitControls.js";
+import { Scene_1 } from "./src/scenes/scene1.js";
+import { Scene_2 } from "./src/scenes/scene2.js";
+import { Scene_3 } from "./src/scenes/scene3.js";
+import { Scene_4 } from "./src/scenes/scene4.js";
 
-const w = window.innerWidth;
-const h = window.innerHeight;
-// renderer.setAnimationLoop(animate);
-// const renderer = new THREE.WebGLRenderer({ antialias: true });
-const renderer = new THREE.WebGLRenderer();
-renderer.setAnimationLoop(animate);
-renderer.setSize(w, h);
-document.body.appendChild(renderer.domElement);
-const fov = 75;
-const aspect = w / h;
-const near = 0.1;
-const far = 10;
-const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-camera.position.z = 2;
-const scene = new THREE.Scene();
+document.querySelector("#app").innerHTML = `
+  <div>
+    <canvas class="webgl"></canvas>
+    <!-- horizonatal list of for switching scenes -->
+    <div class="scene-switcher">
+        <button id="scene1">Scene 1</button>
+        <button id="scene2">Scene 2</button>
+        <button id="scene3">Scene 3</button>
+        <div id="player"></div>
+        <button id="scene4">Scene 4</button>
+    </div>
+    
+  </div>
+`;
 
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.03;
+const canvas = document.querySelector("canvas.webgl");
 
-const geo = new THREE.IcosahedronGeometry(1.0, 1.0);
-const mat = new THREE.MeshStandardMaterial({
-  color: 0x000035,
-  flatShading: true,
-  transparent: true,
-  opacity: 1.0,
+// Renderer
+const renderer = new THREE.WebGLRenderer({
+  canvas: canvas,
+  antialias: true,
+  alpha: true,
 });
-const wireMat = new THREE.MeshBasicMaterial({
-  color: 0x00000,
-  wireframe: true,
-});
-const wireMesh = new THREE.Mesh(geo, wireMat);
-wireMesh.scale.setScalar(1.001);
-const mesh = new THREE.Mesh(geo, mat);
-mesh.add(wireMesh);
-scene.add(mesh);
+renderer.setSize(window.innerWidth, window.innerHeight);
 
-const hemiLight = new THREE.HemisphereLight(0x000080, 0x000035, 0x000053);
-scene.add(hemiLight);
-
-function animate() {
-  wireMesh.rotation.x += 0.01;
-  wireMesh.rotation.y += 0.01;
-
-  // requestAnimationFrame(animate);
-  renderer.render(scene, camera);
-  controls.update();
+// Orbit controls
+let currentScene = null;
+function updateScene(scene) {
+  if (currentScene) {
+    currentScene.finalize();
+  }
+  currentScene = scene;
 }
-animate();
+
+updateScene(new Scene_1(renderer));
+
+// Switch scenes
+document.getElementById("scene1").addEventListener("click", () => {
+  updateScene(new Scene_1(renderer));
+});
+
+document.getElementById("scene2").addEventListener("click", () => {
+  updateScene(new Scene_2(renderer));
+});
+
+document.getElementById("scene3").addEventListener("click", () => {
+  updateScene(new Scene_3(renderer));
+});
+
+document.getElementById("scene4").addEventListener("click", () => {
+  updateScene(new Scene_4(renderer));
+});
+
+// On page resize set new renderer size
+window.addEventListener("resize", () => {
+  if (!currentScene && !currentScene.getCamera()) return;
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  currentScene.resize(window.innerWidth, window.innerHeight);
+});
+
+// Render Loop
+const clock = new THREE.Clock();
+function animate() {
+  if (!currentScene) return;
+  const elapsedTime = clock.getElapsedTime();
+  currentScene.animate(elapsedTime);
+}
+
+renderer.setAnimationLoop(animate);
