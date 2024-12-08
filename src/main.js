@@ -1,9 +1,9 @@
 import "./style.css";
 import * as THREE from "three";
-import { Scene_1 } from "./src/scenes/scene1.js";
-import { Scene_2 } from "./src/scenes/scene2.js";
-import { Scene_3 } from "./src/scenes/scene3.js";
-import { Scene_4 } from "./src/scenes/scene4.js";
+import { Scene_1 } from "./scenes/scene1.js";
+import { Scene_2 } from "./scenes/scene2.js";
+import { Scene_3 } from "./scenes/scene3.js";
+import { Scene_4 } from "./scenes/scene4.js";
 
 document.querySelector("#app").innerHTML = `
   <div>
